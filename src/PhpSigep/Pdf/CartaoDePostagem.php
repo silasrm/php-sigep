@@ -164,7 +164,7 @@ class CartaoDePostagem
                 $headerColWidth = $wInnerFourAreas / 3;
                 $headerHeigth = 106;
                 if ($this->logoFile) {
-                    $this->pdf->Image($this->logoFile, 3, 0, 25);
+                    $this->pdf->Image($this->logoFile, 72, 0, 25);
                 }
 
 //                // Título da etiqueta
@@ -189,7 +189,7 @@ class CartaoDePostagem
                 $this->setFillColor(150, 150, 200);
                 $wChancela = 101.5;
                 $hChancela = 72.5;
-                $lPosChancela = 66;
+                $lPosChancela = 3;
                 $tPosChancela = $this->pdf->GetY();
 
                 $servicoDePostagem = $objetoPostal->getServicoDePostagem();
@@ -247,7 +247,7 @@ class CartaoDePostagem
 
                 // Volume
                 $this->setFillColor(100, 150, 200);
-                $this->pdf->SetXY(0, 30);
+                $this->pdf->SetXY(0, 32);
 
                 $nf = (float)$objetoPostal->getDestino()->getNumeroNotaFiscal();
                 if($nf > 0) {
@@ -259,13 +259,13 @@ class CartaoDePostagem
                     $numeroPedido = '    Pedido: ' . $numeroPedido;
                 }
 
-                $this->pdf->SetFontSize(7);
-                $this->t($this->pdf->w, 'Volume: 1/1    '.'Peso(kg): ' . ((float)$objetoPostal->getPeso()) . $nf . $numeroPedido, 1, 'C',  null);
+                $this->pdf->SetFontSize(9);
+                $this->t($this->pdf->w, (($nf) ? $nf : '')."    Peso(kg):".((float)$objetoPostal->getPeso())."     $numeroPedido", 1, 'C',  null);
 
                 // Número da etiqueta
                 $this->setFillColor(100, 100, 200);
                 $this->pdf->SetXY(0, $this->pdf->GetY() + 1);
-                $this->pdf->SetFontSize(9);
+                $this->pdf->SetFontSize(11);
                 $this->pdf->SetFont('', 'B');
                 $etiquetaComDv = $objetoPostal->getEtiqueta()->getEtiquetaComDv();
                 $this->t($wInnerFourAreas, $etiquetaComDv, 1, 'C');
@@ -275,7 +275,7 @@ class CartaoDePostagem
                 $tPosEtiquetaBarCode = $this->pdf->GetY();
 
                 $hEtiquetaBarCode = 22;
-                $wEtiquetaBarCode = 78;
+                $wEtiquetaBarCode = 86;
 
                 $code128 = new \PhpSigep\Pdf\Script\BarCode128();
                 $code128->draw(
@@ -287,10 +287,31 @@ class CartaoDePostagem
                     $hEtiquetaBarCode
                 );
 
+                // Nome legível, document e rubrica
+                $this->pdf->SetXY(48,65.5);
+                $this->pdf->SetFontSize(9);
+                $this->pdf->SetFont('', '');
+                $this->t(1, "Nome Legível: ________________________________________", 10, 'C',  null);
+                $this->pdf->SetXY(48,70);
+                $this->t(2, "Documento: ___________________  Rubrica: _______________", 10, 'C',  null);
+
                 // Destinatário
                 $wAddressLeftCol = $this->pdf->w - 5;
 
-                $tPosAfterBarCode = $this->pdf->GetY() + 25;
+                $tPosAfterBarCode = $this->pdf->GetY() + 2.5;
+
+                // Borda destinatário 
+                $this->pdf->Rect(3, 75, 94, 42, 'D');
+
+                // Volume 1/1
+                $this->setFillColor(100, 100, 200);
+                $this->pdf->SetXY(75,76);
+                $this->pdf->SetFontSize(11);
+                $this->pdf->SetFont('', 'B');
+                $this->t(10, 'Volume 001/001', 1, 'C');
+
+                $this->pdf->Rect(3, 75, 94, 42, 'D');
+
                 $t = $this->writeDestinatario(
                     $lPosFourAreas,
                     $tPosAfterBarCode,
@@ -364,7 +385,7 @@ class CartaoDePostagem
                     $semaCodeGD = $semacode->asGDImage($sM2Dtext);
 
                     $this->setFillColor(222, 222, 222);
-                    $this->pdf->gdImage($semaCodeGD, 35, 3, 25);
+                    $this->pdf->gdImage($semaCodeGD, 36, 3, 25);
                     imagedestroy($semaCodeGD);
 
                 }
@@ -547,8 +568,8 @@ class CartaoDePostagem
         if ($utf8) {
             $txt = $this->_($txt);
         }
-//		$border = 1;
-//		$fill   = true;
+//      $border = 1;
+//      $fill   = true;
         $border = 0;
         $fill = false;
 
