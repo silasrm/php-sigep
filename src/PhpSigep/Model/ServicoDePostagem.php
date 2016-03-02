@@ -1,6 +1,6 @@
+
 <?php
 namespace PhpSigep\Model;
-
 /**
  * @author: Stavarengo
  */
@@ -8,11 +8,13 @@ class ServicoDePostagem extends AbstractModel
 {
     const SERVICE_PAC_41068                  = 41068;
     const SERVICE_PAC_41106                  = 41106;
+    const SERVICE_PAC_41530                  = 41530;
     const SERVICE_PAC_GRANDES_FORMATOS       = 41300;
     const SERVICE_E_SEDEX_STANDARD           = 81019;
     const SERVICE_SEDEX_40096                = 40096;
     const SERVICE_SEDEX_40436                = 40436;
     const SERVICE_SEDEX_40444                = 40444;
+    const SERVICE_SEDEX_41548                = 41548;
     const SERVICE_SEDEX_12                   = 40169;
     const SERVICE_SEDEX_10                   = 40215;
     const SERVICE_SEDEX_10_PACOTE            = 40886;
@@ -26,15 +28,16 @@ class ServicoDePostagem extends AbstractModel
     const SERVICE_CARTA_COMERCIAL_A_FATURAR  = 10065;
     const SERVICE_CARTA_REGISTRADA           = 10014;
 //    const SERVICE_CARTA_REGISTRADA           = 10138;
-
     protected static $services = array(
         self::SERVICE_PAC_41068                  => array('Pac 41068', 109819),
         self::SERVICE_PAC_41106                  => array('Pac 41106', 110353),
+        self::SERVICE_PAC_41530                  => array('Pac 41530', null),
         self::SERVICE_PAC_GRANDES_FORMATOS       => array('Pac Grandes Formatos', 120366),
         self::SERVICE_E_SEDEX_STANDARD           => array('E-Sedex Standard', 104672),
         self::SERVICE_SEDEX_40096                => array('Sedex 40096', 104625),
         self::SERVICE_SEDEX_40436                => array('Sedex 40436', 109810),
         self::SERVICE_SEDEX_40444                => array('Sedex 40444', 109811),
+        self::SERVICE_SEDEX_41548                => array('Sedex 41548', null),
         self::SERVICE_SEDEX_12                   => array('Sedex 12', 115218),
         self::SERVICE_SEDEX_10                   => array('Sedex 10', 104707),
         self::SERVICE_SEDEX_10_PACOTE            => array('Sedex 10 Pacote', null),
@@ -48,7 +51,6 @@ class ServicoDePostagem extends AbstractModel
         self::SERVICE_CARTA_COMERCIAL_A_FATURAR  => array('Carta Comercial a Faturar', 109480),
         self::SERVICE_CARTA_REGISTRADA           => array('Carta Registrada', 116985),
     );
-
     /**
      * @var int
      */
@@ -61,7 +63,6 @@ class ServicoDePostagem extends AbstractModel
      * @var string
      */
     protected $nome;
-
     /**
      * @param int $serviceCode
      *        One of the constants {@link ServicoDePostagem}::SERVICE_*
@@ -73,7 +74,6 @@ class ServicoDePostagem extends AbstractModel
         if (!isset(self::$services[$serviceCode])) {
             throw new Exception('There is no service with the code "' . $serviceCode . '".');
         }
-
         $service = self::$services[$serviceCode];
         parent::__construct(
             array(
@@ -83,7 +83,6 @@ class ServicoDePostagem extends AbstractModel
             )
         );
     }
-
     /**
      * @return ServicoDePostagem[]
      */
@@ -96,7 +95,6 @@ class ServicoDePostagem extends AbstractModel
         
         return $r;
     }
-
     /**
      * @param int $serviceCode
      *        One of the constants {@link ServicoDePostagem}::SERVICE_*
@@ -107,7 +105,6 @@ class ServicoDePostagem extends AbstractModel
     {
         return $this->getCodigo() == $serviceCode;
     }
-
     /**
      * @return int
      */
@@ -115,7 +112,6 @@ class ServicoDePostagem extends AbstractModel
     {
         return $this->codigo;
     }
-
     /**
      * @param int $codigo
      */
@@ -123,7 +119,6 @@ class ServicoDePostagem extends AbstractModel
     {
         $this->codigo = $codigo;
     }
-
     /**
      * @return int
      */
@@ -131,7 +126,6 @@ class ServicoDePostagem extends AbstractModel
     {
         return $this->idServico;
     }
-
     /**
      * @param int $idServico
      */
@@ -139,7 +133,6 @@ class ServicoDePostagem extends AbstractModel
     {
         $this->idServico = $idServico;
     }
-
     /**
      * @return string
      */
@@ -147,7 +140,6 @@ class ServicoDePostagem extends AbstractModel
     {
         return $this->nome;
     }
-
     /**
      * @param string $nome
      */
@@ -155,6 +147,4 @@ class ServicoDePostagem extends AbstractModel
     {
         $this->nome = $nome;
     }
-
-
 }
