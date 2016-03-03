@@ -1,5 +1,6 @@
 <?php
 namespace PhpSigep\Model;
+
 /**
  * @author: Stavarengo
  */
@@ -27,7 +28,29 @@ class ServicoDePostagem extends AbstractModel
     const SERVICE_CARTA_COMERCIAL_A_FATURAR = 10065;
     const SERVICE_CARTA_REGISTRADA = 10014;
     //    const SERVICE_CARTA_REGISTRADA           = 10138;
-    protected static $services = array(self::SERVICE_PAC_41068 => array('Pac 41068', 109819), self::SERVICE_PAC_41106 => array('Pac 41106', 110353), self::SERVICE_PAC_41530 => array('Pac 41530', null), self::SERVICE_PAC_GRANDES_FORMATOS => array('Pac Grandes Formatos', 120366), self::SERVICE_E_SEDEX_STANDARD => array('E-Sedex Standard', 104672), self::SERVICE_SEDEX_40096 => array('Sedex 40096', 104625), self::SERVICE_SEDEX_40436 => array('Sedex 40436', 109810), self::SERVICE_SEDEX_40444 => array('Sedex 40444', 109811), self::SERVICE_SEDEX_41548 => array('Sedex 41548', null), self::SERVICE_SEDEX_12 => array('Sedex 12', 115218), self::SERVICE_SEDEX_10 => array('Sedex 10', 104707), self::SERVICE_SEDEX_10_PACOTE => array('Sedex 10 Pacote', null), self::SERVICE_SEDEX_HOJE_40290 => array('Sedex Hoje 40290', 108934), self::SERVICE_SEDEX_HOJE_40878 => array('Sedex Hoje 40878', null), self::SERVICE_SEDEX_A_VISTA => array('Sedex a vista', 104295), self::SERVICE_SEDEX_VAREJO_A_COBRAR => array('Sedex Varejo a Cobrar', null), self::SERVICE_SEDEX_AGRUPADO => array('Sedex Agrupado', 119461), self::SERVICE_SEDEX_REVERSO => array('Sedex Reverso', 109806), self::SERVICE_SEDEX_PAGAMENTO_NA_ENTREGA => array('Sedex Pagamento na Entrega', 114976), self::SERVICE_CARTA_COMERCIAL_A_FATURAR => array('Carta Comercial a Faturar', 109480), self::SERVICE_CARTA_REGISTRADA => array('Carta Registrada', 116985));
+    protected static $services = array(
+        self::SERVICE_PAC_41068 => array('Pac 41068', 109819),
+        self::SERVICE_PAC_41106 => array('Pac 41106', 110353),
+        self::SERVICE_PAC_41530 => array('Pac 41530', 121725),
+        self::SERVICE_PAC_GRANDES_FORMATOS => array('Pac Grandes Formatos', 120366),
+        self::SERVICE_E_SEDEX_STANDARD => array('E-Sedex Standard', 104672),
+        self::SERVICE_SEDEX_40096 => array('Sedex 40096', 104625),
+        self::SERVICE_SEDEX_40436 => array('Sedex 40436', 109810),
+        self::SERVICE_SEDEX_40444 => array('Sedex 40444', 109811),
+        self::SERVICE_SEDEX_41548 => array('Sedex 41548', 121726),
+        self::SERVICE_SEDEX_12 => array('Sedex 12', 115218),
+        self::SERVICE_SEDEX_10 => array('Sedex 10', 104707),
+        self::SERVICE_SEDEX_10_PACOTE => array('Sedex 10 Pacote', null),
+        self::SERVICE_SEDEX_HOJE_40290 => array('Sedex Hoje 40290', 108934),
+        self::SERVICE_SEDEX_HOJE_40878 => array('Sedex Hoje 40878', null),
+        self::SERVICE_SEDEX_A_VISTA => array('Sedex a vista', 104295),
+        self::SERVICE_SEDEX_VAREJO_A_COBRAR => array('Sedex Varejo a Cobrar', null),
+        self::SERVICE_SEDEX_AGRUPADO => array('Sedex Agrupado', 119461),
+        self::SERVICE_SEDEX_REVERSO => array('Sedex Reverso', 109806),
+        self::SERVICE_SEDEX_PAGAMENTO_NA_ENTREGA => array('Sedex Pagamento na Entrega', 114976),
+        self::SERVICE_CARTA_COMERCIAL_A_FATURAR => array('Carta Comercial a Faturar', 109480),
+        self::SERVICE_CARTA_REGISTRADA => array('Carta Registrada', 116985)
+    );
     /**
      * @var int
      */
@@ -40,6 +63,7 @@ class ServicoDePostagem extends AbstractModel
      * @var string
      */
     protected $nome;
+
     /**
      * @param int $serviceCode
      *        One of the constants {@link ServicoDePostagem}::SERVICE_*
@@ -58,6 +82,7 @@ class ServicoDePostagem extends AbstractModel
             'idServico' => $service[1]
         ));
     }
+
     /**
      * @return ServicoDePostagem[]
      */
@@ -67,9 +92,10 @@ class ServicoDePostagem extends AbstractModel
         foreach (self::$services as $serviceCode => $serviceDetails) {
             $r[] = new self($serviceCode);
         }
-        
+
         return $r;
     }
+
     /**
      * @param int $serviceCode
      *        One of the constants {@link ServicoDePostagem}::SERVICE_*
@@ -80,6 +106,7 @@ class ServicoDePostagem extends AbstractModel
     {
         return $this->getCodigo() == $serviceCode;
     }
+
     /**
      * @return int
      */
@@ -87,6 +114,7 @@ class ServicoDePostagem extends AbstractModel
     {
         return $this->codigo;
     }
+
     /**
      * @param int $codigo
      */
@@ -94,6 +122,7 @@ class ServicoDePostagem extends AbstractModel
     {
         $this->codigo = $codigo;
     }
+
     /**
      * @return int
      */
@@ -101,6 +130,7 @@ class ServicoDePostagem extends AbstractModel
     {
         return $this->idServico;
     }
+
     /**
      * @param int $idServico
      */
@@ -108,6 +138,7 @@ class ServicoDePostagem extends AbstractModel
     {
         $this->idServico = $idServico;
     }
+
     /**
      * @return string
      */
@@ -115,6 +146,7 @@ class ServicoDePostagem extends AbstractModel
     {
         return $this->nome;
     }
+
     /**
      * @param string $nome
      */
