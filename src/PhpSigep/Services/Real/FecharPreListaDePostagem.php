@@ -33,8 +33,8 @@ class FecharPreListaDePostagem
         }
 
         $xml = utf8_encode($xmlDaPreLista->flush());
-//		$xml = utf8_encode($xml);
-//		$xml = iconv('UTF-8', 'ISO-8859-1', $xml);
+		$xml = utf8_encode($xml);
+		$xml = iconv('UTF-8', 'ISO-8859-1', $xml);
 
         $soapArgs = array(
             'xml'            => $xml,
@@ -81,7 +81,7 @@ class FecharPreListaDePostagem
         $writer->openMemory();
         $writer->setIndentString("");
         $writer->setIndent(false);
-        $writer->startDocument('1.0', 'UTF-8');
+        $writer->startDocument('1.0', 'ISO-8859-1');
 
         $writer->startElement('correioslog');
         $writer->writeElement('tipo_arquivo', 'Postagem');
