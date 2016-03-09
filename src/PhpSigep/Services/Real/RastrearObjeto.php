@@ -12,6 +12,10 @@ use PhpSigep\Services\Result;
  */
 class RastrearObjeto
 {
+    /**
+     * @var array
+     */
+    protected $objetos = [];
 
     /**
      * @param \PhpSigep\Model\RastrearObjeto $params
@@ -29,8 +33,7 @@ class RastrearObjeto
                 $tipo = 'F';
                 break;
             default:
-                throw new \PhpSigep\Services\Real\Exception\RastrearObjeto\TipoInvalidoException("Tipo '" . $params->getTipo(
-                    ) . "' não é valido");
+                throw new \PhpSigep\Services\Real\Exception\RastrearObjeto\TipoInvalidoException("Tipo '" . $params->getTipo() . "' não é valido");
                 break;
         }
         switch ($params->getTipoResultado()) {
@@ -41,26 +44,29 @@ class RastrearObjeto
                 $tipoResultado = 'T';
                 break;
             default:
-                throw new \PhpSigep\Services\Real\Exception\RastrearObjeto\TipoResultadoInvalidoException("Tipo de resultado '" . $params->getTipo(
-                    ) . "' não é valido");
+                throw new \PhpSigep\Services\Real\Exception\RastrearObjeto\TipoResultadoInvalidoException("Tipo de resultado '" . $params->getTipo() . "' não é valido");
                 break;
         }
 
+        $objetos = [];
         $post = array(
-            'usuario'   => $params->getAccessData()->getUsuario(),
-            'senha'     => $params->getAccessData()->getSenha(),
-            'tipo'      => $tipo,
+            'usuario' => $params->getAccessData()->getUsuario(),
+            'senha' => $params->getAccessData()->getSenha(),
+            'tipo' => $tipo,
             'Resultado' => $tipoResultado,
-            'objetos'    => implode(
+            'objetos' => implode(
                 '',
                 array_map(
-                    function (\PhpSigep\Model\Etiqueta $etiqueta) {
+                    function (\PhpSigep\Model\Etiqueta $etiqueta) use ($objetos) {
+                        $objetos[] = $etiqueta->getEtiquetaComDv();
                         return $etiqueta->getEtiquetaComDv();
                     },
                     $params->getEtiquetas()
                 )
             ),
         );
+
+        $this->objetos = $objetos;
 
         $postContent = http_build_query($post);
 
@@ -69,36 +75,39 @@ class RastrearObjeto
         curl_setopt_array(
             $ch,
             array(
-                CURLOPT_URL            => 'http://websro.correios.com.br/sro_bin/sroii_xml.eventos',
-                CURLOPT_POST           => true,
+                CURLOPT_URL => 'http://websro.correios.com.br/sro_bin/sroii_xml.eventos',
+                CURLOPT_POST => true,
                 CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POSTFIELDS     => $postContent,
+                CURLOPT_POSTFIELDS => $postContent,
                 CURLOPT_SSL_VERIFYPEER => false,
             )
         );
 
         // "usuario=ECT  &senha=SRO   &tipo=L&Resultado=T&objetos=SQ458226057BRRA132678652BRSX142052885BR"
         // "Usuario=sigep&Senha=n5f9t8&Tipo=L&Resultado=T&Objetos=SQ458226057BR"
-        
+
         $curlResult = curl_exec($ch);
-        $curlErrno  = curl_errno($ch);
-        $curlErr    = curl_error($ch);
+        $curlErrno = curl_errno($ch);
+        $curlErr = curl_error($ch);
         curl_close($ch);
 
         $result = new Result();
 
         if ($curlErrno) {
-            $result->setErrorMsg("Erro de comunicação com o Correios ao tentar buscar os dados de rastreamento. Detalhes: \"$curlErrno - $curlErr\".");
+            $result->setErrorMsg("Erro de comunicação com o Correios ao tentar buscar os dados de rastreamento. "
+                . "Detalhes: \"$curlErrno - $curlErr\".");
             $result->setErrorCode($curlErrno);
-        } else if (!$curlResult) {
-            $result->setErrorMsg("Resposta do Correios veio vazia");
         } else {
-            try {
-                $eventos = $this->_parseResult($curlResult);
-                $result->setResult($eventos);
-            } catch (RastrearObjetoException $e) {
-                $result->setErrorCode(0);
-                $result->setErrorMsg($e->getMessage());
+            if (!$curlResult) {
+                $result->setErrorMsg("Resposta do Correios veio vazia");
+            } else {
+                try {
+                    $eventos = $this->_parseResult($curlResult);
+                    $result->setResult($eventos);
+                } catch (RastrearObjetoException $e) {
+                    $result->setErrorCode(0);
+                    $result->setErrorMsg($e->getMessage());
+                }
             }
         }
 
@@ -116,57 +125,62 @@ class RastrearObjeto
 //        $curlResult = SoapClientFactory::convertEncoding($curlResult);
         $simpleXml = new \SimpleXMLElement($curlResult);
         if ($simpleXml->error) {
-            throw new RastrearObjetoException('Erro ao rastrear objetos. Resposta do Correios: "' . $simpleXml->error . '"');
-        } else if ($simpleXml->objeto) {
-            $qtdObjetos = $simpleXml->qtd;
-            $objetos    = $simpleXml->objeto;
-            $result    = array();
-            for ($i = 0; $i < $qtdObjetos; $i++) {
-                $objeto      = $objetos[$i];
-                $resultado   = new RastrearObjetoResultado();
-                $resultado->setEtiqueta(new Etiqueta(array('etiquetaComDv' => $objeto->numero)));
-                foreach ($objeto->evento as $evento) {
-                    $dataHoraStr = $evento->data . ' ' . $evento->hora;
-                    $dataHora    = \DateTime::createFromFormat('d/m/Y H:i', $dataHoraStr);
-                    $tipo = strtoupper($evento->tipo);
-                    $status = (int)$evento->status;
-                    $descricao = $evento->descricao;
-                    $detalhes = null;
-                    if ($tipo == 'PO' && $status === 9) {
-                        $detalhes = 'Objeto sujeito a encaminhamento no próximo dia útil.';
-                    } else if ($evento->destino
-                        && (($tipo == 'DO' && in_array($status, array(0, 1, 2)))
-                        || ($tipo == 'PMT' && $status === 1)
-                        || ($tipo == 'TRI' && $status === 1)
-                        || ($tipo == 'RO' && in_array($status, array(0, 1)))
-                    )) {
-                        $detalhes = 'Objeto encaminhado para ' . $evento->destino->cidade . '/' . $evento->destino->uf;
-                        if ($evento->destino->bairro) {
-                            $detalhes .= ' - Bairro: ' . $evento->destino->bairro;
+            throw new RastrearObjetoException('Erro ao rastrear objetos. Resposta do Correios: "'
+                . $simpleXml->error . '". Objetos: ' . implode(',', $this->objetos) . '.');
+        } else {
+            if ($simpleXml->objeto) {
+                $qtdObjetos = $simpleXml->qtd;
+                $objetos = $simpleXml->objeto;
+                $result = array();
+                for ($i = 0; $i < $qtdObjetos; $i++) {
+                    $objeto = $objetos[$i];
+                    $resultado = new RastrearObjetoResultado();
+                    $resultado->setEtiqueta(new Etiqueta(array('etiquetaComDv' => $objeto->numero)));
+                    foreach ($objeto->evento as $evento) {
+                        $dataHoraStr = $evento->data . ' ' . $evento->hora;
+                        $dataHora = \DateTime::createFromFormat('d/m/Y H:i', $dataHoraStr);
+                        $tipo = strtoupper($evento->tipo);
+                        $status = (int)$evento->status;
+                        $descricao = $evento->descricao;
+                        $detalhes = null;
+                        if ($tipo == 'PO' && $status === 9) {
+                            $detalhes = 'Objeto sujeito a encaminhamento no próximo dia útil.';
+                        } else {
+                            if ($evento->destino
+                                && (($tipo == 'DO' && in_array($status, array(0, 1, 2)))
+                                    || ($tipo == 'PMT' && $status === 1)
+                                    || ($tipo == 'TRI' && $status === 1)
+                                    || ($tipo == 'RO' && in_array($status, array(0, 1)))
+                                )
+                            ) {
+                                $detalhes = 'Objeto encaminhado para ' . $evento->destino->cidade . '/' . $evento->destino->uf;
+                                if ($evento->destino->bairro) {
+                                    $detalhes .= ' - Bairro: ' . $evento->destino->bairro;
+                                }
+                                if ($evento->destino->local) {
+                                    $detalhes .= ' - Local: ' . $evento->destino->local;
+                                }
+                            }
                         }
-                        if ($evento->destino->local) {
-                            $detalhes .= ' - Local: ' . $evento->destino->local;
-                        }
+
+                        $resultado->addEvento(new RastrearObjetoEvento(array(
+                            'tipo' => $tipo,
+                            'status' => $status,
+                            'dataHora' => $dataHora,
+                            'descricao' => $descricao,
+                            'detalhes' => $detalhes,
+                            'local' => $evento->local,
+                            'codigo' => $evento->codigo,
+                            'cidade' => $evento->cidade,
+                            'uf' => $evento->uf,
+                        )));
                     }
 
-                    $resultado->addEvento(new RastrearObjetoEvento(array(
-                        'tipo'      => $tipo,
-                        'status'    => $status,
-                        'dataHora'  => $dataHora,
-                        'descricao' => $descricao,
-                        'detalhes'  => $detalhes,
-                        'local'     => $evento->local,
-                        'codigo'    => $evento->codigo,
-                        'cidade'    => $evento->cidade,
-                        'uf'        => $evento->uf,
-                    )));
+                    $result[] = $resultado;
                 }
-                
-                $result[] = $resultado;
             }
         }
-        
+
         return $result;
     }
-
 }
