@@ -48,25 +48,23 @@ class RastrearObjeto
                 break;
         }
 
-        $objetos = [];
+        $this->objetos = array_map(
+            function (\PhpSigep\Model\Etiqueta $etiqueta) {
+                return $etiqueta->getEtiquetaComDv();
+            },
+            $params->getEtiquetas()
+        );
         $post = array(
             'usuario' => $params->getAccessData()->getUsuario(),
             'senha' => $params->getAccessData()->getSenha(),
             'tipo' => $tipo,
             'Resultado' => $tipoResultado,
-            'objetos' => implode(
-                '',
-                array_map(
-                    function (\PhpSigep\Model\Etiqueta $etiqueta) use ($objetos) {
-                        $objetos[] = $etiqueta->getEtiquetaComDv();
-                        return $etiqueta->getEtiquetaComDv();
-                    },
-                    $params->getEtiquetas()
-                )
-            ),
+            'objetos' => implode('', $this->objetos),
         );
 
-        $this->objetos = $objetos;
+        if(count($this->objetos) == 0) {
+            throw new RastrearObjetoException('Erro ao rastrear objetos. Nenhum objeto informado.');
+        }
 
         $postContent = http_build_query($post);
 
