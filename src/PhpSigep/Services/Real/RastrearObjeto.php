@@ -19,9 +19,11 @@ class RastrearObjeto
 
     /**
      * @param \PhpSigep\Model\RastrearObjeto $params
-     * @return \PhpSigep\Services\Result<\PhpSigep\Model\RastrearObjetoResultado[]>
-     * @throws Exception\RastrearObjeto\TipoResultadoInvalidoException
+     * @return Result <\PhpSigep\Model\RastrearObjetoResultado[]>
      * @throws Exception\RastrearObjeto\TipoInvalidoException
+     * @throws Exception\RastrearObjeto\TipoResultadoInvalidoException
+     * @throws RastrearObjetoException
+     * @throws \PhpSigep\Services\InvalidArgument
      */
     public function execute(\PhpSigep\Model\RastrearObjeto $params)
     {
@@ -36,6 +38,7 @@ class RastrearObjeto
                 throw new \PhpSigep\Services\Real\Exception\RastrearObjeto\TipoInvalidoException("Tipo '" . $params->getTipo() . "' não é valido");
                 break;
         }
+
         switch ($params->getTipoResultado()) {
             case \PhpSigep\Model\RastrearObjeto::TIPO_RESULTADO_APENAS_O_ULTIMO_EVENTO:
                 $tipoResultado = 'U';
@@ -44,7 +47,23 @@ class RastrearObjeto
                 $tipoResultado = 'T';
                 break;
             default:
-                throw new \PhpSigep\Services\Real\Exception\RastrearObjeto\TipoResultadoInvalidoException("Tipo de resultado '" . $params->getTipo() . "' não é valido");
+                throw new \PhpSigep\Services\Real\Exception\RastrearObjeto\TipoResultadoInvalidoException(
+                    "Tipo de resultado '" . $params->getTipoResultado() . "' não é valido"
+                );
+                break;
+        }
+
+        switch ($params->getIdioma()) {
+            case \PhpSigep\Model\RastrearObjeto::IDIOMA_PORTUGUES:
+                $idioma = 101;
+                break;
+            case \PhpSigep\Model\RastrearObjeto::IDIOMA_INGLES:
+                $idioma = 102;
+                break;
+            default:
+                throw new \PhpSigep\Services\Real\Exception\RastrearObjeto\TipoResultadoInvalidoException(
+                    "Idioma '" . $params->getIdioma() . "' não é valido"
+                );
                 break;
         }
 
@@ -58,7 +77,8 @@ class RastrearObjeto
             'usuario' => $params->getAccessData()->getUsuario(),
             'senha' => $params->getAccessData()->getSenha(),
             'tipo' => $tipo,
-            'Resultado' => $tipoResultado,
+            'resultado' => $tipoResultado,
+            'lingua' => $idioma,
             'objetos' => implode('', $this->objetos),
         );
 
