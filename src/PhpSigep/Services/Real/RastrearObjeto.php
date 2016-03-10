@@ -53,20 +53,6 @@ class RastrearObjeto
                 break;
         }
 
-        switch ($params->getIdioma()) {
-            case \PhpSigep\Model\RastrearObjeto::IDIOMA_PORTUGUES:
-                $idioma = 101;
-                break;
-            case \PhpSigep\Model\RastrearObjeto::IDIOMA_INGLES:
-                $idioma = 102;
-                break;
-            default:
-                throw new \PhpSigep\Services\Real\Exception\RastrearObjeto\TipoResultadoInvalidoException(
-                    "Idioma '" . $params->getIdioma() . "' não é valido"
-                );
-                break;
-        }
-
         $this->objetos = array_map(
             function (\PhpSigep\Model\Etiqueta $etiqueta) {
                 return $etiqueta->getEtiquetaComDv();
@@ -74,12 +60,11 @@ class RastrearObjeto
             $params->getEtiquetas()
         );
         $post = array(
-            'usuario' => $params->getAccessData()->getUsuario(),
-            'senha' => $params->getAccessData()->getSenha(),
-            'tipo' => $tipo,
-            'resultado' => $tipoResultado,
-            'lingua' => $idioma,
-            'objetos' => implode('', $this->objetos),
+            'Usuario' => $params->getAccessData()->getUsuario(),
+            'Senha' => $params->getAccessData()->getSenha(),
+            'Tipo' => $tipo,
+            'Resultado' => $tipoResultado,
+            'Objetos' => implode('', $this->objetos),
         );
 
         if(count($this->objetos) == 0) {
@@ -151,6 +136,13 @@ class RastrearObjeto
                 $objetos = $simpleXml->objeto;
                 $result = array();
                 for ($i = 0; $i < $qtdObjetos; $i++) {
+                    // Caso seja passado uma lista e algum objeto não seja encontrado,
+                    // o Correios não retorna nada sobre ele, então $qtdObjetos fica
+                    // diferente do tamanho da lista de objetos.
+                    if(!isset($objetos[$i])) {
+                        continue;
+                    }
+
                     $objeto = $objetos[$i];
                     $resultado = new RastrearObjetoResultado();
                     $resultado->setEtiqueta(new Etiqueta(array('etiquetaComDv' => $objeto->numero)));
