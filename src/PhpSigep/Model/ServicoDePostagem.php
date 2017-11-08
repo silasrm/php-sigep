@@ -10,7 +10,7 @@ class ServicoDePostagem extends AbstractModel
     const SERVICE_PAC_04669 = '04669';
     const SERVICE_PAC_41106 = 41106;
     const SERVICE_PAC_41530 = 41530;
-    const SERVICE_PAC_GRANDES_FORMATOS = 04693;
+    const SERVICE_PAC_GRANDES_FORMATOS = '04693';
     const SERVICE_E_SEDEX_STANDARD = 81019;
     const SERVICE_SEDEX_40096 = 40096;
     const SERVICE_SEDEX_04162 = '04162';
