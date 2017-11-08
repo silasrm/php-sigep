@@ -7,11 +7,13 @@ namespace PhpSigep\Model;
 class ServicoDePostagem extends AbstractModel
 {
     const SERVICE_PAC_41068 = 41068;
+    const SERVICE_PAC_04669 = '04669';
     const SERVICE_PAC_41106 = 41106;
     const SERVICE_PAC_41530 = 41530;
-    const SERVICE_PAC_GRANDES_FORMATOS = 41300;
+    const SERVICE_PAC_GRANDES_FORMATOS = 04693;
     const SERVICE_E_SEDEX_STANDARD = 81019;
     const SERVICE_SEDEX_40096 = 40096;
+    const SERVICE_SEDEX_04162 = '04162';
     const SERVICE_SEDEX_40436 = 40436;
     const SERVICE_SEDEX_40444 = 40444;
     const SERVICE_SEDEX_41548 = 41548;
@@ -30,11 +32,13 @@ class ServicoDePostagem extends AbstractModel
     //    const SERVICE_CARTA_REGISTRADA           = 10138;
     protected static $services = array(
         self::SERVICE_PAC_41068 => array('Pac 41068', 109819),
+        self::SERVICE_PAC_04669 => array('Pac 04669', 124884),
         self::SERVICE_PAC_41106 => array('Pac 41106', 110353),
         self::SERVICE_PAC_41530 => array('Pac 41530', 121725),
-        self::SERVICE_PAC_GRANDES_FORMATOS => array('Pac Grandes Formatos', 120366),
+        self::SERVICE_PAC_GRANDES_FORMATOS => array('Pac Grandes Formatos', 125248),
         self::SERVICE_E_SEDEX_STANDARD => array('E-Sedex Standard', 104672),
         self::SERVICE_SEDEX_40096 => array('Sedex 40096', 104625),
+        self::SERVICE_SEDEX_04162 => array('Sedex 04162', 124849),
         self::SERVICE_SEDEX_40436 => array('Sedex 40436', 109810),
         self::SERVICE_SEDEX_40444 => array('Sedex 40444', 109811),
         self::SERVICE_SEDEX_41548 => array('Sedex 41548', 121726),
